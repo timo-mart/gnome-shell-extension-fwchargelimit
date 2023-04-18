@@ -1,7 +1,7 @@
 {
   "name": "Framework Laptop Power Settings",
   "description": "Control chargelimit on a Framework Laptop with ectool",
-  "uuid": "fwpowersettings@tomart.github.com",
+  "uuid": "fwpowersettings@tomart.github.io",
   "shell-version": [
     "43"
   ]
