@@ -16,26 +16,27 @@ class FeatureMenuToggle extends QuickSettings.QuickMenuToggle {
     _init() {
         super._init({
             label: 'Charge Control',
-            iconName: 'anatine-indicator',
+            iconName: 'gnome-power-manager-symbolic',
             toggleMode: true,
         });
         
         // This function is unique to this class. It adds a nice header with an
         // icon, title and optional subtitle. It's recommended you do so for
         // consistency with other menus.
-        this.menu.setHeader('anatine-indicator', 'Feature Header',
-            'Optional Subtitle');
+        this.menu.setHeader('gnome-power-manager-symbolic', 'Feature Header',
+            'Current limit: ' + get() + '%');
         
         // You may also add sections of items to the menu
         this._itemsSection = new PopupMenu.PopupMenuSection();
-        this._itemsSection.addAction('60%', () => run('sudo ectool fwchargelimit 60'));
-        this._itemsSection.addAction('80%', () => run('sudo ectool fwchargelimit 80'));
-        this._itemsSection.addAction('100%', () => run('sudo ectool fwchargelimit 100'));
+        this._itemsSection.addAction('60%', () => set(60));
+        this._itemsSection.addAction('80%', () => set(80));
+        this._itemsSection.addAction('100%', () => set(100));
+        this._itemsSection.addAction('Get', () => get());
         this.menu.addMenuItem(this._itemsSection);
         
-        function run(command) {
+        function set(percentage) {
             try {
-                let [, stdout, stderr, status] = GLib.spawn_command_line_sync(command);
+                let [, stdout, stderr, status] = GLib.spawn_command_line_sync('sudo ectool fwchargelimit ' + percentage);
             
                 if (status !== 0) {
                     if (stderr instanceof Uint8Array)
@@ -49,6 +50,29 @@ class FeatureMenuToggle extends QuickSettings.QuickMenuToggle {
             
                 // Now were done blocking the main loop, phewf!
                 log(stdout);
+                this.menu.setHeader
+            } catch (e) {
+                logError(e);
+            }
+        }
+        function get() {
+            try {
+                let [, stdout, stderr, status] = GLib.spawn_command_line_sync('sudo ectool fwchargelimit');
+            
+                if (status !== 0) {
+                    if (stderr instanceof Uint8Array)
+                        stderr = ByteArray.toString(stderr);
+            
+                    throw new Error(stderr);
+                }
+            
+                if (stdout instanceof Uint8Array)
+                    stdout = ByteArray.toString(stdout);
+            
+                // Now were done blocking the main loop, phewf!
+                log(stdout);
+                this.menu.setHeader
+                return stdout.trim(); 
             } catch (e) {
                 logError(e);
             }
@@ -77,7 +101,7 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
 
         // Create the icon for the indicator
         this._indicator = this._addIndicator();
-        this._indicator.icon_name = 'uninterruptible-power-supply-symbolic';
+        this._indicator.icon_name = 'gnome-power-manager-symbolic';
 
         // Create the toggle menu and associate it with the indicator, being
         // sure to destroy it along with the indicator
