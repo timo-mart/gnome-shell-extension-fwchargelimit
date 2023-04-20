@@ -11,8 +11,8 @@ const QuickSettings = imports.ui.quickSettings;
 // This is the live instance of the Quick Settings menu
 const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
 
-const FeatureToggle = GObject.registerClass(
-class FeatureToggle extends QuickSettings.QuickToggle {
+const ChargeLimitToggle = GObject.registerClass(
+class ChargeLimitToggle extends QuickSettings.QuickToggle {
     _init() {
         super._init({
             label: 'Charge Full',
@@ -124,8 +124,8 @@ class FeatureToggle extends QuickSettings.QuickToggle {
 
 
 
-const FeatureIndicator = GObject.registerClass(
-class FeatureIndicator extends QuickSettings.SystemIndicator {
+const ChargeLimitIndicator = GObject.registerClass(
+class ChargeLimitIndicator extends QuickSettings.SystemIndicator {
     _init() {
         super._init();
 
@@ -151,7 +151,7 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
 
         // Create the toggle menu and associate it with the indicator, being
         // sure to destroy it along with the indicator
-        this.quickSettingsItems.push(new FeatureToggle());
+        this.quickSettingsItems.push(new ChargeLimitToggle());
         
         this.connect('destroy', () => {
             this.quickSettingsItems.forEach(item => item.destroy());
@@ -190,7 +190,7 @@ class Extension {
     }
     
     enable() {
-        this._indicator = new FeatureIndicator();
+        this._indicator = new ChargeLimitIndicator();
         if (this._proxy !== null) {
             // Extension already enabled
             return;
