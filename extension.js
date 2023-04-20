@@ -1,4 +1,4 @@
-const {Gio, GObject, St} = imports.gi;
+const {Gio, GObject, UPowerGlib: UPower} = imports.gi;
 const ByteArray = imports.byteArray;
 const GLib = imports.gi.GLib;
 
@@ -33,9 +33,58 @@ class FeatureToggle extends QuickSettings.QuickToggle {
             Gio.SettingsBindFlags.DEFAULT);
 
         this.connectObject(
-            'clicked', () => this._updateChargeLimit(this._settings.get_boolean('show-indicator')),
+            'clicked', () => this._clicked(),
             this);
+            
+        const sysIndicator = Main.panel.statusArea.quickSettings._system;
+        const { powerToggle } = sysIndicator._systemItem;
+        const proxy = powerToggle._proxy;
+        this._proxy = proxy;
     }
+
+    _update() {
+        let percentage = this._proxy.Percentage;
+        log('updated ' + percentage)
+        if (percentage >= 100) {
+            this._disable();
+            this._settings.set_boolean('show-indicator', false)
+        }
+    }
+
+    _clicked() {
+        let charging = this._proxy.State === UPower.DeviceState.CHARGING;
+        let percentage = this._proxy.Percentage;
+        log(charging)
+        log(percentage)
+        if (this._settings.get_boolean('show-indicator')) {
+            // ENABLED
+            if (percentage < 100) {
+                this._enable();
+            } else {
+                this._settings.set_boolean('show-indicator', false);
+            }
+        } else {
+            // DISABLED  
+            this._disable();
+        }
+    }
+
+    _enable() {
+        this._updateChargeLimit(true);
+        this._proxyId = this._proxy?.connect(
+            'g-properties-changed',
+            this._update.bind(this)
+          );
+        log('enabled');
+    }
+
+    _disable() {
+        this._updateChargeLimit(false);
+        log('disabled');
+        this._proxy.disconnect(this._proxyId);
+        this._proxyId = null;
+    }
+    
     _updateChargeLimit(b) {
         if (b) {
             this._setChargeFull()
@@ -64,7 +113,7 @@ class FeatureToggle extends QuickSettings.QuickToggle {
                 stdout = ByteArray.toString(stdout);
         
             // Now were done blocking the main loop, phewf!
-            log(stdout);
+            // log(stdout);
         } catch (e) {
             logError(e);
         }   
@@ -90,9 +139,10 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
 
         let charge = this._getChargeLimit()
         if (charge == 100) {
-            this._settings.set_boolean('show-indicator', true)
+            this._settings.set_boolean('show-indicator', true);
+
         } else {
-            this._settings.set_boolean('show-indicator', false)
+            this._settings.set_boolean('show-indicator', false);
         }
 
         this._settings.bind('show-indicator',
@@ -141,6 +191,10 @@ class Extension {
     
     enable() {
         this._indicator = new FeatureIndicator();
+        if (this._proxy !== null) {
+            // Extension already enabled
+            return;
+        }
     }
     
     disable() {
