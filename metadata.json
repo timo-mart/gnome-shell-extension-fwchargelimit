@@ -3,7 +3,8 @@
   "description": "Control chargelimit on a Framework Laptop with ectool",
   "uuid": "fwpowersettings@tomart.github.io",
   "shell-version": [
-    "43"
+    "43",
+    "44"
   ],
   "session-modes": ["user", "unlock-dialog"]
 }
