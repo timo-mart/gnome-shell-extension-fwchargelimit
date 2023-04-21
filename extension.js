@@ -15,7 +15,7 @@ const ChargeLimitToggle = GObject.registerClass(
 class ChargeLimitToggle extends QuickSettings.QuickToggle {
     _init() {
         super._init({
-            label: 'Charge Full',
+            title: 'Charge Full',
             iconName: 'gnome-power-manager-symbolic',
             toggleMode: true,
         });
@@ -160,6 +160,11 @@ class ChargeLimitIndicator extends QuickSettings.SystemIndicator {
         // Add the indicator to the panel and the toggle to the menu
         QuickSettingsMenu._indicators.add_child(this);
         QuickSettingsMenu._addItems(this.quickSettingsItems);
+        for (const item of this.quickSettingsItems) {
+            QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
+                QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
+        }
+
     }
     _getChargeLimit() {
         try {
