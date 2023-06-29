@@ -16,7 +16,7 @@ class ChargeLimitToggle extends QuickSettings.QuickToggle {
     _init() {
         super._init({
             title: 'Charge Full',
-            iconName: 'gnome-power-manager-symbolic',
+            iconName: 'org.gnome.Settings-power-symbolic',
             toggleMode: true,
         });
         
@@ -131,7 +131,7 @@ class ChargeLimitIndicator extends QuickSettings.SystemIndicator {
 
         // Create the icon for the indicator
         this._indicator = this._addIndicator();
-        this._indicator.icon_name = 'gnome-power-manager-symbolic';
+        this._indicator.icon_name = 'org.gnome.Settings-power-symbolic';
 
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.shell.extensions.fwchargelimit',
