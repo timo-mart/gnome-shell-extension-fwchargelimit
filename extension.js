@@ -44,18 +44,18 @@ class ChargeLimitToggle extends QuickSettings.QuickToggle {
 
     _update() {
         let percentage = this._proxy.Percentage;
-        log('updated ' + percentage)
-        if (percentage >= 100) {
-            this._disable();
-            this._settings.set_boolean('show-indicator', false)
-        }
+        // log('updated ' + percentage)
+        // if (percentage >= 100) {
+        //     this._disable();
+        //     this._settings.set_boolean('show-indicator', false)
+        // }
     }
 
     _clicked() {
         let charging = this._proxy.State === UPower.DeviceState.CHARGING;
         let percentage = this._proxy.Percentage;
-        log(charging)
-        log(percentage)
+        // log(charging)
+        // log(percentage)
         if (this._settings.get_boolean('show-indicator')) {
             // ENABLED
             if (percentage < 100) {
@@ -75,12 +75,12 @@ class ChargeLimitToggle extends QuickSettings.QuickToggle {
             'g-properties-changed',
             this._update.bind(this)
           );
-        log('enabled');
+        // log('enabled');
     }
 
     _disable() {
         this._updateChargeLimit(false);
-        log('disabled');
+        // log('disabled');
         this._proxy.disconnect(this._proxyId);
         this._proxyId = null;
     }
